@@ -11,6 +11,16 @@ You are an AI coding agent. The owner asked you to install this repository on th
 - Keep values the owner gives you in a file **outside this repo** (`~/.config/harness-setup/owner.env`, mode 600). Never write them into this repo.
 - Reply in the owner's language. Everything you write into files stays English.
 
+## Step 0: get the repository
+
+If you were not started inside a clone of this repository, clone it first (it is public; no login is needed):
+
+```bash
+git clone https://github.com/kouzen-neo/harness-setup.git ~/Documents/harness-setup
+```
+
+If `~/Documents/harness-setup` already exists, run `git pull --ff-only` there, unless it has local changes: then do not pull, and tell the owner. Work from that folder from now on.
+
 ## Step 1: look around (read-only)
 
 Run `./install.sh --detect`. It prints `key=value` lines: the OS, shell, which agent CLIs are installed, which tools are present, and whether a rules folder already exists. Missing `git` or `python3` means stop and tell the owner what to install (see `docs/INSTALL.md`).

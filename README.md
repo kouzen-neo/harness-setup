@@ -14,7 +14,7 @@ Instead of keeping a different instruction file in every tool, you keep **one sh
 ## Quick start
 
 ```bash
-git clone <this repo> harness-setup && cd harness-setup
+git clone https://github.com/kouzen-neo/harness-setup.git ~/Documents/harness-setup && cd ~/Documents/harness-setup
 ./install.sh --detect            # what this machine has
 ./install.sh --dry-run           # what would change
 ./install.sh                     # install (asks before changing anything)
@@ -25,10 +25,11 @@ Put your own values (language, shell, domain, ...) in a private file and pass it
 
 ## Let an agent install it for you
 
-Open your agent in this folder and paste:
+Open your agent in any folder and paste:
 
 ```text
-Read AGENTS.md in this repository and install harness-setup on this machine for me.
+Clone https://github.com/kouzen-neo/harness-setup.git into ~/Documents/harness-setup (if that folder already exists, run git pull there instead),
+read AGENTS.md in it, and install harness-setup on this machine for me.
 Ask me the questions it lists before you change anything, show me the dry-run, and wait for my OK.
 Never ask me to paste a password, token, or API key into the chat.
 ```

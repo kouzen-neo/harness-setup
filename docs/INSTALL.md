@@ -19,7 +19,7 @@ You install the agent CLIs yourself, as each vendor documents, and you log in yo
 ## Steps
 
 ```bash
-git clone <this repo> harness-setup && cd harness-setup
+git clone https://github.com/kouzen-neo/harness-setup.git ~/Documents/harness-setup && cd ~/Documents/harness-setup
 ./install.sh --detect                      # read-only: shows what is installed
 mkdir -p ~/.config/harness-setup
 cp config/example.env ~/.config/harness-setup/owner.env   # keep this file OUT of the repo
