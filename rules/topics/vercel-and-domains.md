@@ -1,0 +1,9 @@
+<!-- when: Deploying to Vercel or adding a subdomain -->
+# Vercel deploys and subdomains
+
+- Deploys use the Vercel CLI from the repo root of a folder already linked to its project (a `.vercel/` folder exists), team `{{VERCEL_TEAM}}`. Run the build first (for example `npm run build`, so type errors fail before the deploy), then `vercel --prod --yes`. Never deploy to production, and never push, on your own: only when the owner asks. Preview deploys (`vercel` without `--prod`) are fine for checking a change.
+- Pushing to Git may or may not deploy: check whether the Vercel project is git-linked before pushing, and tell the owner.
+- After a deploy, verify the live site (`curl` the domain, check the deployment status and logs) and report the URL and the result as they are, including failures. Never print env values or secrets; check variables with `vercel env ls` only.
+- Subdomains use the owner's domain `{{DOMAIN}}`, with DNS at {{DNS_PROVIDER}}: `<name>.{{DOMAIN}}`. Steps: add a CNAME record `<name>` pointing to `cname.vercel-dns.com` (if the provider proxies traffic, as Cloudflare does by default, set the record to DNS only); attach the domain with `vercel domains add <name>.{{DOMAIN}} <project>` (the project name is required, otherwise Vercel answers `Domain not found`); check with `vercel domains inspect <name>.{{DOMAIN}}`. The nameserver warning there is expected when DNS stays at the provider. The certificate can take about a minute. Set the build env `SITE=https://<domain>` and `BASE=/`.
+- DNS and domain changes are outward-facing: state exactly which record or domain will change and wait for a clear yes. If you cannot change DNS yourself, give the owner the exact record to add. Never buy a domain, and never move DNS away from the current provider.
+- Before first use, check the project's `DEPLOY.md` and any project notes in the vault.

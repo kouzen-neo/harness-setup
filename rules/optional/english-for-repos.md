@@ -1,0 +1,1 @@
+- Everything that goes into code or a repository (comments, identifiers, docs, README, commit messages, PR text, model cards, file names) is English, whatever language the owner chats in.

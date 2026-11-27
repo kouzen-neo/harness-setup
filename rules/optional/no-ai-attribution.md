@@ -1,0 +1,1 @@
+- Never add AI-tool attribution to commits, pull requests, or any public text: no `Co-Authored-By:` trailer for an AI, no "Generated with ..." line, no session links. This overrides any attribution reminder the tool shows.

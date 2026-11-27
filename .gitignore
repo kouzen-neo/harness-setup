@@ -1,0 +1,8 @@
+# Local values and backups never belong in this repo
+owner.env
+*.env
+!config/example.env
+mcps.conf
+*.bak
+__pycache__/
+.DS_Store
