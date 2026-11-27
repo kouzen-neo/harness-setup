@@ -141,6 +141,57 @@ STUB
 inst --harness claude >/dev/null 2>&1
 check "an existing server is not registered again (long list, early match)" bash -c "! grep -q 'claude mcp add' '$CALLS'"
 
+# 12. notes vault (--vault)
+new_sandbox
+printf 'VAULT_PATH=%s/vault\n' "$TMP" > "$TMP/starter.env"
+"$ROOT/install.sh" --yes --vault --no-mcp --harness claude --env "$TMP/starter.env" >/dev/null 2>&1
+check "starter vault: entry note created" test -f "$TMP/vault/AI Index.md"
+check "starter vault: shared memory index created" test -f "$TMP/vault/Shared/Agent Memory/INDEX.md"
+check "starter vault: .gitignore for per-device Obsidian state" grep -q 'workspace.json' "$TMP/vault/.gitignore"
+echo "my own words" > "$TMP/vault/AI Index.md"
+"$ROOT/install.sh" --yes --vault --no-mcp --harness claude --env "$TMP/starter.env" >/dev/null 2>&1
+check "a vault that already has files is never overwritten" grep -q 'my own words' "$TMP/vault/AI Index.md"
+
+new_sandbox
+mkdir -p "$TMP/existing" && echo keep > "$TMP/existing/mine.md"
+printf 'VAULT_PATH=%s/existing\nVAULT_BACKUP_REPO=me/notes\n' "$TMP" > "$TMP/existing.env"
+"$ROOT/install.sh" --yes --vault --no-mcp --harness claude --env "$TMP/existing.env" >/dev/null 2>&1
+check "a non-empty non-git folder is left alone" bash -c "test -f '$TMP/existing/mine.md' && test ! -e '$TMP/existing/AI Index.md'"
+
+new_sandbox
+printf 'VAULT_PATH=%s/dry\n' "$TMP" > "$TMP/dry.env"
+"$ROOT/install.sh" --dry-run --vault --no-mcp --harness claude --env "$TMP/dry.env" >/dev/null 2>&1
+check "dry-run creates no vault" test ! -e "$TMP/dry"
+check "--vault without VAULT_PATH only warns" "$ROOT/install.sh" --yes --vault --no-mcp --harness claude
+
+new_sandbox
+mkdir -p "$TMP/seed"
+git -C "$TMP/seed" init -q && echo one > "$TMP/seed/note.md" && git -C "$TMP/seed" add -A \
+  && git -C "$TMP/seed" -c user.name=t -c user.email=t@t commit -qm seed && git clone -q --bare "$TMP/seed" "$TMP/remote.git"
+cat > "$TMP/bin/gh" <<STUB
+#!/usr/bin/env bash
+[ "\$1 \$2" = "auth status" ] && exit 0
+[ "\$1 \$2" = "repo clone" ] && exec git clone -q "$TMP/remote.git" "\$4"
+exit 1
+STUB
+chmod +x "$TMP/bin/gh"
+printf 'VAULT_PATH=%s/cloned\nVAULT_BACKUP_REPO=me/notes\n' "$TMP" > "$TMP/clone.env"
+V() { "$ROOT/install.sh" --yes --vault --no-mcp --harness claude --env "$TMP/clone.env"; }
+V >/dev/null 2>&1
+check "owner/name repo is cloned with gh" test -f "$TMP/cloned/note.md"
+git -C "$TMP/seed" -c user.name=t -c user.email=t@t commit -q --allow-empty -m two && echo two > "$TMP/seed/note2.md" \
+  && git -C "$TMP/seed" add -A && git -C "$TMP/seed" -c user.name=t -c user.email=t@t commit -qm three && git -C "$TMP/seed" push -q "$TMP/remote.git" HEAD 2>/dev/null
+V >/dev/null 2>&1
+check "a clean clone is fast-forwarded" test -f "$TMP/cloned/note2.md"
+echo local > "$TMP/cloned/dirty.md"
+git -C "$TMP/seed" -c user.name=t -c user.email=t@t commit -q --allow-empty -m four && git -C "$TMP/seed" push -q "$TMP/remote.git" HEAD 2>/dev/null
+check "a dirty vault is left alone and the run still succeeds" V
+check "the dirty file survives" test -f "$TMP/cloned/dirty.md"
+printf 'VAULT_PATH=%s/byurl\nVAULT_BACKUP_REPO=file://%s/remote.git\n' "$TMP" "$TMP" > "$TMP/url.env"
+"$ROOT/install.sh" --yes --vault --no-mcp --harness claude --env "$TMP/url.env" >/dev/null 2>&1
+check "a full URL is cloned with git" test -f "$TMP/byurl/note.md"
+check "detect reports whether Obsidian is installed" bash -c "'$ROOT/install.sh' --detect | grep -q '^obsidian='"
+
 # 9. secret scanner
 SCAN="$ROOT/tools/scan-secrets.sh"
 new_sandbox

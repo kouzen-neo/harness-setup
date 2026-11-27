@@ -1,7 +1,7 @@
 <!-- when: Notes vault and shared agent memory (read at the start of work, write durable facts) -->
 # Notes vault and shared agent memory
 
-The owner's notes vault is `{{VAULT_PATH}}` (a git repo, backed up to the private repo `{{VAULT_BACKUP_REPO}}`). If a vault MCP server is registered in your tool, use it; otherwise edit the files directly with the same layout. All agents share these notes so each can see what the others learned.
+The owner's notes vault is `{{VAULT_PATH}}` (a folder of markdown notes, usually opened in Obsidian; a git repo backed up to the private repo `{{VAULT_BACKUP_REPO}}`). If a vault MCP server is registered in your tool, use it; otherwise edit the files directly with the same layout. All agents share these notes so each can see what the others learned.
 
 **Reading**
 - At the start of work on a known project: check the vault is present, read `AI Index.md`, then `Shared/Agent Memory/INDEX.md` and any note relevant to the task, then the project note.

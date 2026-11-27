@@ -9,6 +9,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$ROOT/lib/harnesses.sh"
 . "$ROOT/lib/prereqs.sh"
 . "$ROOT/lib/steps.sh"
+. "$ROOT/lib/vault.sh"
 
 readonly DEFAULT_RULES_DIR="$HOME/.config/agent-rules"
 readonly DEFAULT_SESSIONS_DIR="$HOME/.local/share/agent-session"
@@ -29,6 +30,8 @@ Usage: install.sh [options]
   --adopt            take over an existing unmanaged folder (it is backed up first)
   --no-sessions      do not install the session wrappers
   --no-mcp           do not register MCP servers
+  --vault            also set up the notes vault: clone or update VAULT_BACKUP_REPO into VAULT_PATH,
+                     or create a starter vault there (see docs/OBSIDIAN.md)
   --dry-run          show what would happen, change nothing
   --yes              do not ask for confirmation
   --detect           print what this machine has (for agents), then exit
@@ -39,7 +42,7 @@ USAGE
 parse_args() {
   HARNESS_ARG=detected; TOPIC_ARG=all; OPTIONAL_ARG=""; ENV_FILE=""; MCPS_FILE="$ROOT/config/mcps.example.conf"
   OVERLAY=""; RULES_DIR="$DEFAULT_RULES_DIR"; SESSIONS_DIR="$DEFAULT_SESSIONS_DIR"; BIN_DIR="$DEFAULT_BIN_DIR"
-  ADOPT=0; NO_SESSIONS=0; NO_MCP=0; DRY_RUN=0; ASSUME_YES=0; MODE=install
+  ADOPT=0; NO_SESSIONS=0; NO_MCP=0; WITH_VAULT=0; DRY_RUN=0; ASSUME_YES=0; MODE=install
   while [ $# -gt 0 ]; do
     case "$1" in
       --harness) HARNESS_ARG="${2:?--harness needs a value}"; shift ;;
@@ -52,6 +55,7 @@ parse_args() {
       --adopt) ADOPT=1 ;;
       --no-sessions) NO_SESSIONS=1 ;;
       --no-mcp) NO_MCP=1 ;;
+      --vault) WITH_VAULT=1 ;;
       --dry-run) DRY_RUN=1 ;;
       --yes) ASSUME_YES=1 ;;
       --detect) MODE=detect ;;
@@ -86,6 +90,7 @@ main() {
   select_harnesses; select_topics; select_optionals
   show_plan
   confirm
+  if [ "$WITH_VAULT" = 1 ]; then sync_vault; fi
   prepare_core
   install_rules
   install_core_files

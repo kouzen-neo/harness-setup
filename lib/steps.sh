@@ -203,6 +203,7 @@ show_plan() {
   log "  - optional rules: ${OPTIONALS[*]:-none}"
   log "  - rules folder: $RULES_DIR"
   log "  - session wrappers: $([ "$NO_SESSIONS" = 1 ] && echo skipped || echo "$SESSIONS_DIR")"
+  log "  - notes vault: $([ "$WITH_VAULT" = 1 ] && echo "${VAULT_PATH:-<VAULT_PATH not set>}" || echo "not touched (use --vault)")"
   log "  - MCP servers from: $([ "$NO_MCP" = 1 ] && echo skipped || echo "$MCPS_FILE")"
   log "  - backups of changed files: $BACKUP_DIR"
 }
@@ -229,6 +230,7 @@ run_detect() {
     fi
   done
   prereq_status
+  echo "obsidian=$(detect_obsidian)"
   echo "rules_dir.exists=$([ -d "$RULES_DIR" ] && echo yes || echo no)"
 }
 
@@ -244,5 +246,8 @@ run_check() {
       [ -x "$BIN_DIR/$(wrapper_name "$h")" ] && echo "ok: $(wrapper_name "$h")" || { echo "MISSING: $(wrapper_name "$h")"; bad=1; }
     fi
   done
+  if [ -n "${VAULT_PATH-}" ]; then
+    [ -d "$VAULT_PATH" ] && echo "ok: vault ($VAULT_PATH)" || echo "note: vault folder not found ($VAULT_PATH); run install.sh --vault"
+  fi
   return $bad
 }

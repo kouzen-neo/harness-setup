@@ -7,6 +7,7 @@ Instead of keeping a different instruction file in every tool, you keep **one sh
 ## What you get
 
 - **Global rules** for each agent: a short "always" list plus topic files (code quality, new projects, library docs, shared notes, agent control, Vercel and domains, Android and phone).
+- **A shared notes vault** (works with Obsidian, or any folder of markdown): every agent reads and writes the same notes. `--vault` clones your backup repo or creates a starter vault; see [docs/OBSIDIAN.md](docs/OBSIDIAN.md).
 - **Session wrappers** (`agy-session`, `claude-session`, `opencode-session`) with the same verbs, so one agent can start and message another. No default model on purpose: you choose.
 - **MCP registration** from a plain list (`name|type|command-or-url`).
 - **Safe by design**: managed blocks (your own rules stay), backups before every change, dry-run, check, and uninstall. The installer never reads or writes credentials.
@@ -59,6 +60,7 @@ Details, MCP commands, and other tools that read a repo-level `AGENTS.md`: [docs
 - **Private rules**: a private folder with `rules/` files (an overlay) replaces or extends the repo's rules: `--overlay DIR`.
 - **Optional rules**: `--optional no-ai-attribution,english-for-repos`.
 - **Topics**: `--topics code-quality,new-project` installs only some.
+- **Notes vault**: `--vault` (needs `VAULT_PATH`, optionally `VAULT_BACKUP_REPO`).
 
 More in [docs/RULES.md](docs/RULES.md).
 
@@ -69,6 +71,7 @@ More in [docs/RULES.md](docs/RULES.md).
 | [docs/INSTALL.md](docs/INSTALL.md) | prerequisites, options, update, uninstall |
 | [docs/HARNESSES.md](docs/HARNESSES.md) | per-agent paths and MCP commands |
 | [docs/RULES.md](docs/RULES.md) | how the rules, templates, overlays, and topics work |
+| [docs/OBSIDIAN.md](docs/OBSIDIAN.md) | the notes vault: install Obsidian, create or restore the vault, back it up |
 | [docs/SESSIONS.md](docs/SESSIONS.md) | the session wrappers |
 | [docs/SECURITY.md](docs/SECURITY.md) | what is and is not stored |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | common problems |

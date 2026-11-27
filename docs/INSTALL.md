@@ -45,6 +45,7 @@ Then open a new agent session and ask "What are your global rules?".
 | `--adopt` | take over an existing unmanaged folder or wrapper: it is backed up, then replaced |
 | `--no-sessions` | skip the session wrappers |
 | `--no-mcp` | skip MCP registration |
+| `--vault` | also set up the notes vault (clone or update `VAULT_BACKUP_REPO` into `VAULT_PATH`, or create a starter vault); see [OBSIDIAN.md](OBSIDIAN.md) |
 | `--dry-run` | print what would happen, change nothing |
 | `--yes` | do not ask for confirmation |
 | `--detect`, `--check` | read-only reports |
