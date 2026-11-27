@@ -193,6 +193,33 @@ check "a full URL is cloned with git" test -f "$TMP/byurl/note.md"
 check "detect reports whether Obsidian is installed" bash -c "'$ROOT/install.sh' --detect | grep -q '^obsidian='"
 
 # 9. secret scanner
+# sudo helpers
+new_sandbox
+inst >/dev/null 2>&1
+check "sudo helpers are not installed by default" test ! -e "$HOME/.local/bin/agent-sudo-on"
+inst --sudo-helpers >/dev/null 2>&1
+for n in agent-sudo-on agent-sudo-off agent-sudo-none; do
+  check "sudo helper installed and executable: $n" test -x "$HOME/.local/bin/$n"
+done
+check "sudo helper script has valid bash syntax" bash -n "$HOME/.local/bin/agent-sudo-on"
+check "sudo helper rejects an unknown mode" bash -c "! '$HOME/.local/bin/agent-sudo' maybe >/dev/null 2>&1 && ! '$ROOT/sudo-helpers/agent-sudo' maybe >/dev/null 2>&1"
+cat > "$TMP/bin/sudo" <<'STUB'
+#!/usr/bin/env bash
+if [ "$1" = install ]; then cp "${@: -2:1}" "$SUDO_OUT"; fi
+exit 0
+STUB
+printf '#!/usr/bin/env bash\nexit 0\n' > "$TMP/bin/visudo"
+chmod +x "$TMP/bin/sudo" "$TMP/bin/visudo"
+export SUDO_OUT="$TMP/rule.txt"
+"$HOME/.local/bin/agent-sudo-on" >/dev/null 2>&1
+check "agent-sudo-on writes a full NOPASSWD rule for the current user" grep -qx "$(id -un) ALL=(ALL) NOPASSWD: ALL" "$SUDO_OUT"
+printf '#!/usr/bin/env bash\nexit 0\n' > "$TMP/bin/pacman"; chmod +x "$TMP/bin/pacman"
+"$HOME/.local/bin/agent-sudo-off" >/dev/null 2>&1
+check "agent-sudo-off writes a scoped rule without ALL" bash -c "grep -q 'NOPASSWD: .*pacman' '$SUDO_OUT' && ! grep -q 'NOPASSWD: ALL' '$SUDO_OUT'"
+"$ROOT/uninstall.sh" >/dev/null 2>&1
+check "uninstall removes the sudo helpers" test ! -e "$HOME/.local/bin/agent-sudo-on"
+unset SUDO_OUT
+
 SCAN="$ROOT/tools/scan-secrets.sh"
 new_sandbox
 mkdir -p "$TMP/clean" "$TMP/dirty"

@@ -37,7 +37,8 @@ Ask in small groups, give a recommended default for each, and skip what the dete
 6. **MCP servers.** The default list registers Context7. Ask whether to add others: name, type (`stdio` or `http`), and the command or URL. Servers that need a key are set up by the owner by hand, not by you.
 7. **Notes vault.** Ask whether the owner keeps notes in Obsidian or another markdown folder that all agents should share. Options: create a starter vault; clone a backup repo (`VAULT_BACKUP_REPO` as `owner/name`, which needs the owner's own `gh auth login`, or a full git URL); use an existing folder; or skip it. Collect `VAULT_PATH` (and `VAULT_BACKUP_REPO`), and pass `--vault` if they want it set up. `--detect` prints `obsidian=installed|missing`; if it is missing and the owner uses Obsidian, show them `docs/OBSIDIAN.md` and never install it without a yes.
 8. **Session wrappers.** Ask whether to install `agy-session`, `claude-session`, `opencode-session` (default: yes for the selected agents).
-9. **Existing setup.** If detection says a rules folder already exists, ask: use another folder (`--rules-dir`) or take it over (`--adopt`, backed up first)?
+9. **Sudo helpers.** Only if the sudo topic is chosen: ask whether to install `agent-sudo-on` (full passwordless sudo while developing), `agent-sudo-off` (scoped to the package manager and systemctl) and `agent-sudo-none` (remove the rule) with `--sudo-helpers`. They are plain commands, so they work in any shell. Never run them yourself and never ask for the owner's password: tell the owner to run the command in their own terminal.
+10. **Existing setup.** If detection says a rules folder already exists, ask: use another folder (`--rules-dir`) or take it over (`--adopt`, backed up first)?
 
 ## Step 3: write the owner file
 
@@ -45,7 +46,7 @@ Create `~/.config/harness-setup/owner.env` with the answers (`KEY=value` lines, 
 
 ## Step 4: dry run, confirm, install
 
-1. Run `./install.sh --dry-run --env ~/.config/harness-setup/owner.env` with the chosen flags (`--harness`, `--topics`, `--optional`, `--mcps`, `--rules-dir`, `--adopt`, `--no-sessions`, `--vault`).
+1. Run `./install.sh --dry-run --env ~/.config/harness-setup/owner.env` with the chosen flags (`--harness`, `--topics`, `--optional`, `--mcps`, `--rules-dir`, `--adopt`, `--no-sessions`, `--sudo-helpers`, `--vault`).
 2. Show the owner the plan it prints and wait for a clear yes.
 3. Run the same command with `--yes` instead of `--dry-run`.
 4. Run `./install.sh --check` and report what it says, including failures.

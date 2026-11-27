@@ -29,6 +29,7 @@ Usage: install.sh [options]
   --rules-dir DIR    where the detailed rule files go (default: $DEFAULT_RULES_DIR)
   --adopt            take over an existing unmanaged folder (it is backed up first)
   --no-sessions      do not install the session wrappers
+  --sudo-helpers     install agent-sudo-on / agent-sudo-off / agent-sudo-none (any shell)
   --no-mcp           do not register MCP servers
   --vault            also set up the notes vault: clone or update VAULT_BACKUP_REPO into VAULT_PATH,
                      or create a starter vault there (see docs/OBSIDIAN.md)
@@ -42,7 +43,7 @@ USAGE
 parse_args() {
   HARNESS_ARG=detected; TOPIC_ARG=all; OPTIONAL_ARG=""; ENV_FILE=""; MCPS_FILE="$ROOT/config/mcps.example.conf"
   OVERLAY=""; RULES_DIR="$DEFAULT_RULES_DIR"; SESSIONS_DIR="$DEFAULT_SESSIONS_DIR"; BIN_DIR="$DEFAULT_BIN_DIR"
-  ADOPT=0; NO_SESSIONS=0; NO_MCP=0; WITH_VAULT=0; DRY_RUN=0; ASSUME_YES=0; MODE=install
+  ADOPT=0; NO_SESSIONS=0; WITH_SUDO_HELPERS=0; NO_MCP=0; WITH_VAULT=0; DRY_RUN=0; ASSUME_YES=0; MODE=install
   while [ $# -gt 0 ]; do
     case "$1" in
       --harness) HARNESS_ARG="${2:?--harness needs a value}"; shift ;;
@@ -54,6 +55,7 @@ parse_args() {
       --rules-dir) RULES_DIR="${2:?--rules-dir needs a folder}"; shift ;;
       --adopt) ADOPT=1 ;;
       --no-sessions) NO_SESSIONS=1 ;;
+      --sudo-helpers) WITH_SUDO_HELPERS=1 ;;
       --no-mcp) NO_MCP=1 ;;
       --vault) WITH_VAULT=1 ;;
       --dry-run) DRY_RUN=1 ;;
@@ -95,6 +97,7 @@ main() {
   install_rules
   install_core_files
   install_sessions
+  install_sudo_helpers
   register_mcps
   rm -f "$CORE_TMP"
   show_next_steps

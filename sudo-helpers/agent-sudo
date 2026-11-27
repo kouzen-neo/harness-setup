@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# managed by harness-setup
+# Controls the sudoers rule that lets coding agents run `sudo -n` without a password.
+# Installed under three names that work in any shell:
+#   agent-sudo-on    full passwordless sudo (temporary, for development)
+#   agent-sudo-off   scoped rule: package manager, systemctl and archlinux-java only
+#   agent-sudo-none  remove the rule
+# You type your own sudo password at the sudo prompt; it is never given to an agent.
+set -euo pipefail
+
+readonly RULE_FILE="/etc/sudoers.d/90-agent"
+readonly PACKAGE_MANAGERS="pacman apt-get dnf zypper"
+readonly EXTRA_SCOPED="systemctl archlinux-java"
+
+die() { printf 'agent-sudo: %s\n' "$*" >&2; exit 1; }
+
+scoped_commands() { # absolute paths of the commands the scoped rule allows, comma separated
+  local name path out=""
+  for name in $PACKAGE_MANAGERS $EXTRA_SCOPED; do
+    path=$(command -v "$name" 2>/dev/null || true)
+    [ -n "$path" ] && out="${out:+$out, }$path"
+  done
+  [ -n "$out" ] || die "no package manager found for the scoped rule"
+  printf '%s' "$out"
+}
+
+install_rule() { # $1 rule line; validated with visudo before it replaces the live file
+  local tmp
+  tmp=$(mktemp)
+  trap 'rm -f "$tmp"' EXIT
+  printf '%s\n' "$1" > "$tmp"
+  command -v visudo >/dev/null || die "visudo not found"
+  visudo -cf "$tmp" >/dev/null || die "generated rule failed validation; nothing was changed"
+  sudo install -m 440 -o root -g root "$tmp" "$RULE_FILE"
+}
+
+main() {
+  local user mode
+  user=$(id -un)
+  mode=$(basename "$0")
+  [ -n "${1-}" ] && mode="agent-sudo-$1"
+  case "$mode" in
+    agent-sudo-on)
+      install_rule "$user ALL=(ALL) NOPASSWD: ALL"
+      echo "agent sudo: FULL access on. Turn it down with agent-sudo-off or remove it with agent-sudo-none."
+      ;;
+    agent-sudo-off)
+      install_rule "$user ALL=(ALL) NOPASSWD: $(scoped_commands)"
+      echo "agent sudo: scoped access ($(scoped_commands))"
+      ;;
+    agent-sudo-none)
+      sudo rm -f "$RULE_FILE"
+      echo "agent sudo: rule removed"
+      ;;
+    *) die "usage: agent-sudo-on | agent-sudo-off | agent-sudo-none (or: agent-sudo on|off|none)" ;;
+  esac
+}
+
+main "$@"

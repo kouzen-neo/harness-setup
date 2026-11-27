@@ -155,6 +155,18 @@ write_wrapper() { # $1 command name, $2 adapter
   chmod +x "$path"
 }
 
+install_sudo_helpers() {
+  local name
+  [ "$WITH_SUDO_HELPERS" = 1 ] || return 0
+  run mkdir -p "$BIN_DIR"
+  for name in agent-sudo-on agent-sudo-off agent-sudo-none; do
+    run cp "$ROOT/sudo-helpers/agent-sudo" "$BIN_DIR/$name"
+    run chmod +x "$BIN_DIR/$name"
+    log "sudo helper: $name"
+  done
+  log "sudo helpers work in any shell (fish, zsh, bash); run agent-sudo-on yourself and type your own password at the sudo prompt"
+}
+
 install_sessions() {
   local h
   [ "$NO_SESSIONS" = 1 ] && return 0
@@ -202,6 +214,7 @@ show_plan() {
   log "  - topics: ${TOPICS[*]}"
   log "  - optional rules: ${OPTIONALS[*]:-none}"
   log "  - rules folder: $RULES_DIR"
+  log "  - sudo helpers: $([ "$WITH_SUDO_HELPERS" = 1 ] && echo "$BIN_DIR/agent-sudo-{on,off,none}" || echo skipped)"
   log "  - session wrappers: $([ "$NO_SESSIONS" = 1 ] && echo skipped || echo "$SESSIONS_DIR")"
   log "  - notes vault: $([ "$WITH_VAULT" = 1 ] && echo "${VAULT_PATH:-<VAULT_PATH not set>}" || echo "not touched (use --vault)")"
   log "  - MCP servers from: $([ "$NO_MCP" = 1 ] && echo skipped || echo "$MCPS_FILE")"

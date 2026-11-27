@@ -44,6 +44,7 @@ Then open a new agent session and ask "What are your global rules?".
 | `--rules-dir DIR` | where the detailed rule files go (default `~/.config/agent-rules`) |
 | `--adopt` | take over an existing unmanaged folder or wrapper: it is backed up, then replaced |
 | `--no-sessions` | skip the session wrappers |
+| `--sudo-helpers` | install `agent-sudo-on`, `agent-sudo-off`, `agent-sudo-none` into the bin folder: short commands (any shell) that manage `/etc/sudoers.d/90-agent` so agents can run `sudo -n` without a password. You run them yourself and type your own password at the sudo prompt; nothing is stored. |
 | `--no-mcp` | skip MCP registration |
 | `--vault` | also set up the notes vault (clone or update `VAULT_BACKUP_REPO` into `VAULT_PATH`, or create a starter vault); see [OBSIDIAN.md](OBSIDIAN.md) |
 | `--dry-run` | print what would happen, change nothing |

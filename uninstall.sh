@@ -26,7 +26,7 @@ for h in $KNOWN_HARNESSES; do
     if [ "$DRY_RUN" = 1 ]; then log "[dry-run] remove managed block from $target"; else remove_managed_block "$target"; log "removed rules block: $target"; fi
   fi
 done
-for w in claude-session agy-session opencode-session; do
+for w in claude-session agy-session opencode-session agent-sudo-on agent-sudo-off agent-sudo-none; do
   if [ -f "$BIN_DIR/$w" ] && grep -q 'managed by harness-setup' "$BIN_DIR/$w"; then run rm -f "$BIN_DIR/$w"; log "removed wrapper: $w"; fi
 done
 for dir in "$SESSIONS_DIR" "$RULES_DIR"; do
